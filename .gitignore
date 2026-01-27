@@ -24,16 +24,25 @@ ENV/
 .Trashes
 Thumbs.db
 
+# Temp files
+~$*
+*.tmp
+*.temp
+
 # Streamlit
 .streamlit/secrets.toml
 
-# Project specific
-*.xlsx
-*.docx
-*.pdf
-LEGAL/
-FINANCIERO/*.docx
+# Sensitive/Large files (keep local, don't push)
+DOCS/
 FINANCIERO/*.xlsx
+FINANCIERO/*.docx
+LEGAL/
 
-# Keep HTML dashboards
-!FINANCIERO/*.html
+# Keep these in repo
+!FINANCIERO/DASHBOARD_RADIKAL_2026.html
+!README.md
+!requirements.txt
+!streamlit_app.py
+!CLAUDE.md
+!.claude/
+!.streamlit/config.toml
