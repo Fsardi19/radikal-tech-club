@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radikal Tech Club - Dashboard Financiero 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --success: #00d9a5;
+            --warning: #ffc107;
+            --text: #eaeaea;
+            --text-muted: #a0a0a0;
+            --launch: #6c5ce7;
+            --sell: #00cec9;
+            --optimize: #fdcb6e;
+            --input-bg: rgba(255,255,255,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--highlight), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 25px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            background: var(--highlight);
+            transform: translateY(-2px);
+        }
+
+        .section { display: none; animation: fadeIn 0.5s ease; }
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card h3 {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .card .value { font-size: 1.8rem; font-weight: bold; }
+        .card .value.green { color: var(--success); }
+        .card .value.red { color: var(--highlight); }
+        .card .value.yellow { color: var(--warning); }
+        .card .subtitle { color: var(--text-muted); font-size: 0.8rem; margin-top: 5px; }
+
+        .chart-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-title { font-size: 1.2rem; margin-bottom: 15px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(255,255,255,0.1); font-size: 0.75rem; text-transform: uppercase; }
+
+        /* Inputs editables */
+        input[type="text"], input[type="number"], select {
+            background: var(--input-bg);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        input[type="number"] { text-align: right; }
+        input:focus, select:focus { outline: none; border-color: var(--success); }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-prefix, .input-suffix {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary { background: var(--highlight); color: white; }
+        .btn-success { background: var(--success); color: var(--primary); }
+        .btn-danger { background: rgba(233,69,96,0.3); color: var(--highlight); }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .service-row {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .service-row.launch { border-left-color: var(--launch); }
+        .service-row.sell { border-left-color: var(--sell); }
+        .service-row.optimize { border-left-color: var(--optimize); }
+        .service-row.custom { border-left-color: var(--warning); }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .service-header h4 { font-size: 1.1rem; }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .field-group { margin-bottom: 10px; }
+        .field-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, var(--highlight), #ff6b6b);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .highlight-box h2 { font-size: 2.5rem; margin-bottom: 5px; }
+        .highlight-box.success { background: linear-gradient(135deg, var(--success), #4dffc3); color: var(--primary); }
+        .highlight-box.warning { background: linear-gradient(135deg, var(--warning), #ffdb4d); color: var(--primary); }
+        .highlight-box.neutral { background: linear-gradient(135deg, var(--accent), var(--secondary)); }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .summary-row.total {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding-top: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(0,217,165,0.2); color: var(--success); }
+        .badge-warning { background: rgba(255,193,7,0.2); color: var(--warning); }
+        .badge-danger { background: rgba(233,69,96,0.2); color: var(--highlight); }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .two-columns { grid-template-columns: 1fr; }
+        }
+
+        .vesting-timeline {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .vesting-timeline::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .vesting-point { text-align: center; position: relative; z-index: 2; }
+        .vesting-point .circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto 10px;
+        }
+
+        .legal-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .clause {
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 2px solid var(--accent);
+        }
+
+        .clause h4 { margin-bottom: 5px; font-size: 0.95rem; }
+        .clause p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
+
+        .footer { text-align: center; padding: 30px; color: var(--text-muted); margin-top: 40px; }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .alert-info { background: rgba(15,52,96,0.5); border-left: 4px solid var(--accent); }
+        .alert-success { background: rgba(0,217,165,0.1); border-left: 4px solid var(--success); }
+        .alert-danger { background: rgba(233,69,96,0.1); border-left: 4px solid var(--highlight); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>RADIKAL TECH CLUB</h1>
+        <p style="color: var(--text-muted);">Dashboard Financiero Interactivo 2026 - Plataforma One-Stop Shop IA para MiPyMEs</p>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showSection('informe')">Informe Financiero</button>
+        <button class="nav-tab" onclick="showSection('ingresos')">Modelo de Ingresos</button>
+        <button class="nav-tab" onclick="showSection('presupuesto')">Presupuesto 2026</button>
+        <button class="nav-tab" onclick="showSection('escenarios')">Escenarios de Capital</button>
+        <button class="nav-tab" onclick="showSection('equity')">Equity Agreement</button>
+    </div>
+
+    <!-- SECCIÓN 1: INFORME FINANCIERO -->
+    <div id="informe" class="section active">
+        <div class="highlight-box">
+            <h3>Inversión Total Bajo Gestión JP Pineda</h3>
+            <h2>$53,332.31 USD</h2>
+            <p>Período: Enero 2025 - Presente</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Inversión Pre-JP</h3>
+                <div class="value">$60,602.97</div>
+                <div class="subtitle">Gastos históricos antes de CEO</div>
+            </div>
+            <div class="card">
+                <h3>Inversión Desde JP</h3>
+                <div class="value green">$53,332.31</div>
+                <div class="subtitle">Gestión actual CEO</div>
+            </div>
+            <div class="card">
+                <h3>Total Histórico</h3>
+                <div class="value yellow">$113,935.27</div>
+                <div class="subtitle">Inversión acumulada</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Distribución de Inversión por Jurisdicción</h3>
+            <div class="two-columns">
+                <div><canvas id="chartJurisdiccion"></canvas></div>
+                <div>
+                    <table>
+                        <thead><tr><th>Jurisdicción</th><th>Monto USD</th><th>%</th></tr></thead>
+                        <tbody>
+                            <tr><td>Radikal Colombia</td><td>$6,893.12</td><td><span class="badge badge-success">12.9%</span></td></tr>
+                            <tr><td>Radikal Panamá</td><td>$37,467.19</td><td><span class="badge badge-warning">70.3%</span></td></tr>
+                            <tr><td>Radikal USA</td><td>$8,972.00</td><td><span class="badge badge-danger">16.8%</span></td></tr>
+                            <tr style="font-weight: bold;"><td>TOTAL</td><td>$53,332.31</td><td>100%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Justificación de Gastos</h3>
+            <table>
+                <thead><tr><th>País</th><th>Concepto</th><th>Monto USD</th><th>Justificación</th></tr></thead>
+                <tbody>
+                    <tr><td rowspan="3"><strong>COLOMBIA</strong></td><td>Juan Pablo Pineda (CEO)</td><td>$6,506.19</td><td>Dirección estratégica</td></tr>
+                    <tr><td>Legal</td><td>$222.07</td><td>Estructuración corporativa</td></tr>
+                    <tr><td>Reembolso Apps</td><td>$164.86</td><td>Herramientas digitales</td></tr>
+                    <tr><td rowspan="5"><strong>PANAMÁ</strong></td><td>Juan Pablo Pineda</td><td>$22,627.00</td><td>Gestión regional</td></tr>
+                    <tr><td>Alejandro Rua</td><td>$1,380.00</td><td>Desarrollo técnico</td></tr>
+                    <tr><td>Oscar Pérez</td><td>$1,380.00</td><td>Desarrollo técnico</td></tr>
+                    <tr><td>Infraestructura Digital</td><td>$690.46</td><td>Google, GoDaddy, etc.</td></tr>
+                    <tr><td>Legales Panamá</td><td>$11,389.73</td><td>Constitución y compliance</td></tr>
+                    <tr><td rowspan="3"><strong>USA</strong></td><td>Firstbase</td><td>$2,780.00</td><td>Incorporación</td></tr>
+                    <tr><td>Lok Foods</td><td>$1,547.46</td><td>Cliente piloto</td></tr>
+                    <tr><td>Karu</td><td>$4,644.88</td><td>Cliente estratégico</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: MODELO DE INGRESOS -->
+    <div id="ingresos" class="section">
+        <div class="alert alert-info">
+            <strong>Editor de Servicios</strong> - Modifica precios, cantidades y agrega nuevos servicios. Los cálculos se actualizan automáticamente.
+        </div>
+
+        <div id="servicios-container">
+            <!-- Los servicios se generan dinámicamente -->
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn btn-success" onclick="agregarServicio()">+ Agregar Nuevo Servicio</button>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Resumen de Ingresos Proyectados</h3>
+            <div class="two-columns">
+                <div>
+                    <div id="resumen-ingresos-lista"></div>
+                </div>
+                <div>
+                    <canvas id="chartIngresos"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Total Clientes Proyectados</h3>
+                <div class="value green" id="total-clientes">0</div>
+                <div class="subtitle">Suma de todos los servicios</div>
+            </div>
+            <div class="card">
+                <h3>Ingresos por Setups</h3>
+                <div class="value" id="total-setups">$0</div>
+                <div class="subtitle">Ingresos únicos</div>
+            </div>
+            <div class="card">
+                <h3>Ingresos Recurrentes (MRR)</h3>
+                <div class="value yellow" id="total-mrr">$0</div>
+                <div class="subtitle">Suscripciones mensuales</div>
+            </div>
+            <div class="card">
+                <h3>Ingresos por Fee de Pauta</h3>
+                <div class="value" id="total-fee">$0</div>
+                <div class="subtitle">Comisiones anuales</div>
+            </div>
+        </div>
+
+        <div class="highlight-box success">
+            <h3>Ingresos Anuales Proyectados</h3>
+            <h2 id="total-ingresos-anual">$0</h2>
+            <p id="porcentaje-recurrente">0% recurrente</p>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Análisis por Tipo de Ingreso</h3>
+            <canvas id="chartTipoIngreso" height="100"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Métricas Clave</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>ARPC (Ingreso Promedio/Cliente)</h3>
+                    <div class="value green" id="arpc">$0</div>
+                    <div class="subtitle">Anual</div>
+                </div>
+                <div class="card">
+                    <h3>LTV Estimado (3 años)</h3>
+                    <div class="value" id="ltv">$0</div>
+                    <div class="subtitle">Asumiendo retención 70%</div>
+                </div>
+                <div class="card">
+                    <h3>MRR Proyectado</h3>
+                    <div class="value yellow" id="mrr-mensual">$0</div>
+                    <div class="subtitle">Monthly Recurring Revenue</div>
+                </div>
+                <div class="card">
+                    <h3>ARR Proyectado</h3>
+                    <div class="value green" id="arr">$0</div>
+                    <div class="subtitle">Annual Recurring Revenue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: PRESUPUESTO 2026 -->
+    <div id="presupuesto" class="section">
+        <div class="highlight-box neutral">
+            <h3>Presupuesto Integral 2026</h3>
+            <h2>Ingresos vs Gastos</h2>
+            <p>Análisis completo de viabilidad financiera</p>
+        </div>
+
+        <!-- INGRESOS -->
+        <div class="chart-container">
+            <h3 class="chart-title" style="color: var(--success);">INGRESOS PROYECTADOS</h3>
+            <div class="two-columns">
+                <div>
+                    <div id="presupuesto-ingresos-detalle"></div>
+                    <div class="summary-row total" style="margin-top: 20px; border-top: 2px solid var(--success);">
+                        <span>TOTAL INGRESOS ANUALES</span>
+                        <span class="value green" id="pres-total-ingresos">$0</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 15px; color: var(--text-muted);">Composición de Ingresos</h4>
+                    <canvas id="chartPresIngresos"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- GASTOS -->
+        <div class="chart-container">
+            <h3 class="chart-title" style="color: var(--highlight);">GASTOS OPERATIVOS</h3>
+
+            <div class="alert alert-info" style="margin-bottom: 20px;">
+                <strong>Gastos Editables</strong> - Puedes modificar los montos de nómina y gastos administrativos.
+            </div>
+
+            <div class="two-columns">
+                <div>
+                    <h4 style="margin-bottom: 15px;">Colombia (TRM: <input type="number" id="trm" value="3650" style="width: 80px; display: inline;" onchange="recalcularTodo()">)</h4>
+                    <table>
+                        <thead><tr><th>Concepto</th><th>Mensual COP</th><th>Mensual USD</th><th>Anual USD</th></tr></thead>
+                        <tbody id="gastos-colombia">
+                            <!-- Se genera dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 15px;">Panamá (USD)</h4>
+                    <table>
+                        <thead><tr><th>Concepto</th><th>Mensual USD</th><th>Anual USD</th></tr></thead>
+                        <tbody id="gastos-panama">
+                            <!-- Se genera dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="summary-row total" style="margin-top: 20px; border-top: 2px solid var(--highlight);">
+                <span>TOTAL GASTOS ANUALES</span>
+                <span class="value red" id="pres-total-gastos">$0</span>
+            </div>
+        </div>
+
+        <!-- RESULTADO -->
+        <div class="chart-container">
+            <h3 class="chart-title">RESULTADO OPERACIONAL</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>Ingresos Anuales</h3>
+                    <div class="value green" id="res-ingresos">$0</div>
+                </div>
+                <div class="card">
+                    <h3>Gastos Anuales</h3>
+                    <div class="value red" id="res-gastos">$0</div>
+                </div>
+                <div class="card">
+                    <h3>Resultado Neto</h3>
+                    <div class="value" id="res-neto">$0</div>
+                    <div class="subtitle" id="res-neto-label"></div>
+                </div>
+                <div class="card">
+                    <h3>Margen Operativo</h3>
+                    <div class="value" id="res-margen">0%</div>
+                </div>
+            </div>
+
+            <div id="resultado-box" class="highlight-box" style="margin-top: 20px;">
+                <h3 id="resultado-titulo">Resultado</h3>
+                <h2 id="resultado-valor">$0</h2>
+                <p id="resultado-mensaje"></p>
+            </div>
+        </div>
+
+        <!-- FLUJO MENSUAL -->
+        <div class="chart-container">
+            <h3 class="chart-title">Proyección Mensual</h3>
+            <canvas id="chartFlujoMensual" height="100"></canvas>
+        </div>
+
+        <!-- MÉTRICAS ADICIONALES -->
+        <div class="grid">
+            <div class="card">
+                <h3>Burn Rate Mensual</h3>
+                <div class="value red" id="burn-rate">$0</div>
+                <div class="subtitle">Gastos mensuales</div>
+            </div>
+            <div class="card">
+                <h3>Runway Actual</h3>
+                <div class="value yellow" id="runway">0 meses</div>
+                <div class="subtitle">Con capital de $113,935</div>
+            </div>
+            <div class="card">
+                <h3>Clientes para Breakeven</h3>
+                <div class="value" id="clientes-breakeven">0</div>
+                <div class="subtitle">Con ARPC actual</div>
+            </div>
+            <div class="card">
+                <h3>Mes de Breakeven</h3>
+                <div class="value green" id="mes-breakeven">-</div>
+                <div class="subtitle">Si se cumplen proyecciones</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 4: ESCENARIOS DE CAPITAL -->
+    <div id="escenarios" class="section">
+        <div class="highlight-box neutral">
+            <h3>Análisis de Necesidades de Capital</h3>
+            <h2>Basado en Proyecciones Actuales</h2>
+            <p>Los cálculos se actualizan según los datos de ingresos y gastos</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Capital Actual Disponible</h3>
+                <div class="value yellow">$113,935</div>
+                <div class="subtitle">Inversión histórica acumulada</div>
+            </div>
+            <div class="card">
+                <h3>Déficit/Superávit Proyectado</h3>
+                <div class="value" id="esc-deficit">$0</div>
+                <div class="subtitle" id="esc-deficit-label"></div>
+            </div>
+            <div class="card">
+                <h3>Capital Adicional Requerido</h3>
+                <div class="value red" id="esc-capital-req">$0</div>
+                <div class="subtitle">Para cubrir operación 2026</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Escenarios de Sensibilidad</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Basados en diferentes niveles de cumplimiento de metas de clientes</p>
+
+            <div id="escenarios-container">
+                <!-- Se genera dinámicamente -->
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Impacto en Participación Accionaria</h3>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">Valoración pre-money:
+                <input type="number" id="valoracion-premoney" value="500000" style="width: 120px;" onchange="recalcularEscenarios()"> USD
+            </p>
+            <canvas id="chartDilucion" height="100"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Tabla de Dilución por Escenario</h3>
+            <table id="tabla-dilucion">
+                <thead>
+                    <tr>
+                        <th>Escenario</th>
+                        <th>% Cumplimiento</th>
+                        <th>Ingresos</th>
+                        <th>Déficit</th>
+                        <th>Capital Req.</th>
+                        <th>Equity a Ceder</th>
+                        <th>Fundadores Post</th>
+                        <th>JP Pineda Post</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-dilucion-body">
+                    <!-- Se genera dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Ruta Hacia Breakeven</h3>
+            <canvas id="chartBreakeven" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 5: EQUITY AGREEMENT -->
+    <div id="equity" class="section">
+        <div class="highlight-box" style="background: linear-gradient(135deg, #0f3460, #16213e);">
+            <h3>Equity Vesting Agreement</h3>
+            <h2>Juan Pablo Pineda - CEO</h2>
+            <p>10% de participación | Vesting de 3 años | Inicio: Enero 2026</p>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Cronograma de Vesting (3 Años - 33% Anual)</h3>
+            <div class="vesting-timeline">
+                <div class="vesting-point">
+                    <div class="circle">33%</div>
+                    <div style="font-weight: bold;">Año 1</div>
+                    <div style="color: var(--text-muted);">Ene 2026</div>
+                    <div style="color: var(--success);">3.33%</div>
+                </div>
+                <div class="vesting-point">
+                    <div class="circle">66%</div>
+                    <div style="font-weight: bold;">Año 2</div>
+                    <div style="color: var(--text-muted);">Ene 2027</div>
+                    <div style="color: var(--success);">6.67%</div>
+                </div>
+                <div class="vesting-point">
+                    <div class="circle" style="background: var(--highlight); border-color: var(--highlight);">100%</div>
+                    <div style="font-weight: bold;">Año 3</div>
+                    <div style="color: var(--text-muted);">Ene 2028</div>
+                    <div style="color: var(--success);">10.0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Detalle del Vesting</h3>
+            <table>
+                <thead><tr><th>Fecha</th><th>Acciones</th><th>Acumulado</th><th>% Grant</th><th>% Compañía</th></tr></thead>
+                <tbody>
+                    <tr style="background: rgba(0,217,165,0.1);"><td><strong>1 Enero 2026</strong></td><td>37</td><td>37</td><td>33.33%</td><td><strong>3.33%</strong></td></tr>
+                    <tr style="background: rgba(0,217,165,0.15);"><td><strong>1 Enero 2027</strong></td><td>37</td><td>74</td><td>66.67%</td><td><strong>6.67%</strong></td></tr>
+                    <tr style="background: rgba(233,69,96,0.2);"><td><strong>1 Enero 2028</strong></td><td>37</td><td>111</td><td>100%</td><td><strong>10.0%</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid">
+            <div class="card"><h3>Acciones Pre-Grant</h3><div class="value">1,000</div></div>
+            <div class="card"><h3>Nuevas Acciones</h3><div class="value green">111</div></div>
+            <div class="card"><h3>Total Post-Grant</h3><div class="value yellow">1,111</div></div>
+        </div>
+
+        <div class="legal-section">
+            <h3 style="color: var(--success); margin-bottom: 20px;">Términos Principales</h3>
+            <div class="clause"><h4>1. Período de Vesting</h4><p>3 años, 33.33% anual. Primer vesting en Enero 2026.</p></div>
+            <div class="clause"><h4>2. Good Leaver</h4><p>Retiene acciones vesteadas. No vesteadas se pierden.</p></div>
+            <div class="clause"><h4>3. Bad Leaver</h4><p>Compañía puede recomprar todas las acciones al menor valor.</p></div>
+            <div class="clause"><h4>4. Change of Control</h4><p>100% aceleración si venta/fusión con <50% retención.</p></div>
+            <div class="clause"><h4>5. Pro-Rata</h4><p>Derecho a participar en futuras rondas.</p></div>
+            <div class="clause"><h4>6. Restricciones</h4><p>Transferencia solo con consentimiento del Board.</p></div>
+            <div class="clause"><h4>7. No Competencia</h4><p>12 meses post-terminación.</p></div>
+            <div class="clause"><h4>8. Ley Aplicable</h4><p>República de Panamá, arbitraje ICC.</p></div>
+        </div>
+
+        <div class="chart-container" style="margin-top: 20px;">
+            <h3 class="chart-title">Evolución de Participación</h3>
+            <canvas id="chartVesting" height="80"></canvas>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Radikal Tech Club - Dashboard Financiero Interactivo 2026</p>
+        <p style="font-size: 0.8rem; margin-top: 5px;">Los datos se calculan dinámicamente. Modifica valores en la pestaña "Modelo de Ingresos".</p>
+    </div>
+
+    <script>
+        // ==================== DATOS GLOBALES ====================
+        let servicios = [
+            { id: 1, nombre: 'Radikal Launch', tipo: 'launch', setup: 800, mensual: 75, feePauta: 0, pautaMensual: 0, clientes: 25, descripcion: 'De idea a marca, landing, kit de contenidos' },
+            { id: 2, nombre: 'Radikal Sell', tipo: 'sell', setup: 1500, mensual: 150, feePauta: 15, pautaMensual: 250, clientes: 25, descripcion: 'Sistema de venta completo: tienda, campañas, automatizaciones' },
+            { id: 3, nombre: 'Radikal Optimize', tipo: 'optimize', setup: 600, mensual: 200, feePauta: 0, pautaMensual: 0, clientes: 10, descripcion: 'Diagnóstico 360°, sondeos, tests A/B' }
+        ];
+
+        let gastosColombia = [
+            { concepto: 'Juan Pablo Pineda (CEO)', mensualCOP: 14000000, tipo: 'nomina' },
+            { concepto: 'David Duarte', mensualCOP: 2500000, tipo: 'nomina' },
+            { concepto: 'Servicios Legales', mensualCOP: 416667, tipo: 'honorarios' },
+            { concepto: 'Auxilio Conectividad', mensualCOP: 100000, tipo: 'admin' },
+            { concepto: 'Cámara de Comercio', mensualCOP: 28825, tipo: 'admin' }
+        ];
+
+        let gastosPanama = [
+            { concepto: 'Juan Pablo Pineda (CEO)', mensualUSD: 14000, tipo: 'nomina' },
+            { concepto: 'Alejandro Rua', mensualUSD: 1380, tipo: 'nomina' },
+            { concepto: 'Oscar Pérez', mensualUSD: 1380, tipo: 'nomina' },
+            { concepto: 'Legales', mensualUSD: 125, tipo: 'admin' },
+            { concepto: 'Google Workspace', mensualUSD: 88, tipo: 'software' },
+            { concepto: 'Shopify', mensualUSD: 25, tipo: 'software' },
+            { concepto: 'ChatGPT', mensualUSD: 20, tipo: 'software' },
+            { concepto: 'Contabo', mensualUSD: 5.40, tipo: 'software' },
+            { concepto: 'Freepik', mensualUSD: 6.98, tipo: 'software' },
+            { concepto: 'Apify', mensualUSD: 42.47, tipo: 'software' }
+        ];
+
+        let nextServiceId = 4;
+        const capitalActual = 113935;
+
+        // ==================== NAVEGACIÓN ====================
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+            if (sectionId === 'presupuesto' || sectionId === 'escenarios') {
+                recalcularTodo();
+            }
+        }
+
+        // ==================== SERVICIOS ====================
+        function renderServicios() {
+            const container = document.getElementById('servicios-container');
+            container.innerHTML = servicios.map(s => `
+                <div class="service-row ${s.tipo}" id="service-${s.id}">
+                    <div class="service-header">
+                        <div>
+                            <input type="text" value="${s.nombre}" onchange="updateServicio(${s.id}, 'nombre', this.value)" style="font-size: 1.1rem; font-weight: bold; background: transparent; border: none; color: var(--text); width: 250px;">
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">
+                                <input type="text" value="${s.descripcion}" onchange="updateServicio(${s.id}, 'descripcion', this.value)" style="background: transparent; border: none; color: var(--text-muted); width: 100%;">
+                            </p>
+                        </div>
+                        <button class="btn btn-danger" onclick="eliminarServicio(${s.id})">Eliminar</button>
+                    </div>
+                    <div class="service-grid">
+                        <div class="field-group">
+                            <label>Setup (USD)</label>
+                            <div class="input-group">
+                                <span class="input-prefix">$</span>
+                                <input type="number" value="${s.setup}" onchange="updateServicio(${s.id}, 'setup', parseFloat(this.value))">
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>Suscripción Mensual</label>
+                            <div class="input-group">
+                                <span class="input-prefix">$</span>
+                                <input type="number" value="${s.mensual}" onchange="updateServicio(${s.id}, 'mensual', parseFloat(this.value))">
+                                <span class="input-suffix">/mes</span>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>Fee de Pauta (%)</label>
+                            <div class="input-group">
+                                <input type="number" value="${s.feePauta}" onchange="updateServicio(${s.id}, 'feePauta', parseFloat(this.value))" min="0" max="100">
+                                <span class="input-suffix">%</span>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>Pauta Mensual Cliente</label>
+                            <div class="input-group">
+                                <span class="input-prefix">$</span>
+                                <input type="number" value="${s.pautaMensual}" onchange="updateServicio(${s.id}, 'pautaMensual', parseFloat(this.value))">
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label># Clientes Proyectados</label>
+                            <input type="number" value="${s.clientes}" onchange="updateServicio(${s.id}, 'clientes', parseInt(this.value))" min="0">
+                        </div>
+                        <div class="field-group">
+                            <label>Ingreso/Cliente/Año</label>
+                            <div class="value green" style="font-size: 1.2rem;">$${calcularIngresoCliente(s).toLocaleString()}</div>
+                        </div>
+                        <div class="field-group">
+                            <label>Ingreso Total Anual</label>
+                            <div class="value yellow" style="font-size: 1.2rem;">$${(calcularIngresoCliente(s) * s.clientes).toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            recalcularIngresos();
+        }
+
+        function calcularIngresoCliente(s) {
+            const suscripcionAnual = s.mensual * 12;
+            const feeAnual = (s.feePauta / 100) * s.pautaMensual * 12;
+            return s.setup + suscripcionAnual + feeAnual;
+        }
+
+        function updateServicio(id, campo, valor) {
+            const servicio = servicios.find(s => s.id === id);
+            if (servicio) {
+                servicio[campo] = valor;
+                renderServicios();
+            }
+        }
+
+        function agregarServicio() {
+            servicios.push({
+                id: nextServiceId++,
+                nombre: 'Nuevo Servicio',
+                tipo: 'custom',
+                setup: 500,
+                mensual: 100,
+                feePauta: 0,
+                pautaMensual: 0,
+                clientes: 10,
+                descripcion: 'Descripción del nuevo servicio'
+            });
+            renderServicios();
+        }
+
+        function eliminarServicio(id) {
+            servicios = servicios.filter(s => s.id !== id);
+            renderServicios();
+        }
+
+        // ==================== CÁLCULOS DE INGRESOS ====================
+        function recalcularIngresos() {
+            let totalClientes = 0;
+            let totalSetups = 0;
+            let totalMRR = 0;
+            let totalFeeAnual = 0;
+
+            servicios.forEach(s => {
+                totalClientes += s.clientes;
+                totalSetups += s.setup * s.clientes;
+                totalMRR += s.mensual * s.clientes;
+                totalFeeAnual += (s.feePauta / 100) * s.pautaMensual * 12 * s.clientes;
+            });
+
+            const totalARR = totalMRR * 12;
+            const totalAnual = totalSetups + totalARR + totalFeeAnual;
+            const porcentajeRecurrente = totalAnual > 0 ? ((totalARR / totalAnual) * 100).toFixed(1) : 0;
+            const arpc = totalClientes > 0 ? (totalAnual / totalClientes) : 0;
+
+            document.getElementById('total-clientes').textContent = totalClientes;
+            document.getElementById('total-setups').textContent = '$' + totalSetups.toLocaleString();
+            document.getElementById('total-mrr').textContent = '$' + totalMRR.toLocaleString() + '/mes';
+            document.getElementById('total-fee').textContent = '$' + totalFeeAnual.toLocaleString() + '/año';
+            document.getElementById('total-ingresos-anual').textContent = '$' + totalAnual.toLocaleString();
+            document.getElementById('porcentaje-recurrente').textContent = porcentajeRecurrente + '% recurrente (suscripciones)';
+            document.getElementById('arpc').textContent = '$' + arpc.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('ltv').textContent = '$' + (arpc * 2.1).toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('mrr-mensual').textContent = '$' + totalMRR.toLocaleString();
+            document.getElementById('arr').textContent = '$' + totalARR.toLocaleString();
+
+            // Resumen lista
+            document.getElementById('resumen-ingresos-lista').innerHTML = `
+                ${servicios.map(s => `
+                    <div class="summary-row">
+                        <span>${s.nombre} (${s.clientes} clientes)</span>
+                        <span>$${(calcularIngresoCliente(s) * s.clientes).toLocaleString()}</span>
+                    </div>
+                `).join('')}
+                <div class="summary-row total">
+                    <span>TOTAL INGRESOS</span>
+                    <span style="color: var(--success);">$${totalAnual.toLocaleString()}</span>
+                </div>
+            `;
+
+            actualizarGraficos();
+        }
+
+        // ==================== GASTOS ====================
+        function renderGastos() {
+            const trm = parseFloat(document.getElementById('trm').value) || 3650;
+
+            document.getElementById('gastos-colombia').innerHTML = gastosColombia.map((g, i) => `
+                <tr>
+                    <td>${g.concepto}</td>
+                    <td><input type="number" value="${g.mensualCOP}" onchange="updateGastoColombia(${i}, parseFloat(this.value))" style="width: 120px;"></td>
+                    <td>$${(g.mensualCOP / trm).toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                    <td>$${((g.mensualCOP / trm) * 12).toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                </tr>
+            `).join('') + `
+                <tr style="font-weight: bold; background: rgba(255,255,255,0.1);">
+                    <td>SUBTOTAL COLOMBIA</td>
+                    <td></td>
+                    <td>$${(gastosColombia.reduce((sum, g) => sum + g.mensualCOP, 0) / trm).toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                    <td>$${((gastosColombia.reduce((sum, g) => sum + g.mensualCOP, 0) / trm) * 12).toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                </tr>
+            `;
+
+            document.getElementById('gastos-panama').innerHTML = gastosPanama.map((g, i) => `
+                <tr>
+                    <td>${g.concepto}</td>
+                    <td><input type="number" value="${g.mensualUSD}" onchange="updateGastoPanama(${i}, parseFloat(this.value))" style="width: 100px;" step="0.01"></td>
+                    <td>$${(g.mensualUSD * 12).toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                </tr>
+            `).join('') + `
+                <tr style="font-weight: bold; background: rgba(255,255,255,0.1);">
+                    <td>SUBTOTAL PANAMÁ</td>
+                    <td>$${gastosPanama.reduce((sum, g) => sum + g.mensualUSD, 0).toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                    <td>$${(gastosPanama.reduce((sum, g) => sum + g.mensualUSD, 0) * 12).toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                </tr>
+            `;
+        }
+
+        function updateGastoColombia(index, valor) {
+            gastosColombia[index].mensualCOP = valor;
+            recalcularTodo();
+        }
+
+        function updateGastoPanama(index, valor) {
+            gastosPanama[index].mensualUSD = valor;
+            recalcularTodo();
+        }
+
+        function calcularTotalGastos() {
+            const trm = parseFloat(document.getElementById('trm').value) || 3650;
+            const totalColombia = (gastosColombia.reduce((sum, g) => sum + g.mensualCOP, 0) / trm) * 12;
+            const totalPanama = gastosPanama.reduce((sum, g) => sum + g.mensualUSD, 0) * 12;
+            return totalColombia + totalPanama;
+        }
+
+        function calcularTotalIngresos() {
+            let total = 0;
+            servicios.forEach(s => {
+                total += calcularIngresoCliente(s) * s.clientes;
+            });
+            return total;
+        }
+
+        // ==================== RECÁLCULO GENERAL ====================
+        function recalcularTodo() {
+            renderGastos();
+
+            const ingresos = calcularTotalIngresos();
+            const gastos = calcularTotalGastos();
+            const resultado = ingresos - gastos;
+            const margen = ingresos > 0 ? ((resultado / ingresos) * 100) : 0;
+            const burnRate = gastos / 12;
+            const runway = burnRate > 0 ? (capitalActual / burnRate) : 0;
+            const arpc = servicios.reduce((sum, s) => sum + s.clientes, 0) > 0
+                ? ingresos / servicios.reduce((sum, s) => sum + s.clientes, 0)
+                : 0;
+            const clientesBreakeven = arpc > 0 ? Math.ceil(gastos / arpc) : 0;
+
+            // Presupuesto - Ingresos detalle
+            let totalSetups = 0, totalSuscripciones = 0, totalFees = 0;
+            servicios.forEach(s => {
+                totalSetups += s.setup * s.clientes;
+                totalSuscripciones += s.mensual * 12 * s.clientes;
+                totalFees += (s.feePauta / 100) * s.pautaMensual * 12 * s.clientes;
+            });
+
+            document.getElementById('presupuesto-ingresos-detalle').innerHTML = `
+                <div class="summary-row"><span>Ingresos por Setups</span><span>$${totalSetups.toLocaleString()}</span></div>
+                <div class="summary-row"><span>Suscripciones Anuales</span><span>$${totalSuscripciones.toLocaleString()}</span></div>
+                <div class="summary-row"><span>Fee de Pauta</span><span>$${totalFees.toLocaleString()}</span></div>
+            `;
+
+            document.getElementById('pres-total-ingresos').textContent = '$' + ingresos.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('pres-total-gastos').textContent = '$' + gastos.toLocaleString(undefined, {maximumFractionDigits: 0});
+
+            document.getElementById('res-ingresos').textContent = '$' + ingresos.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('res-gastos').textContent = '$' + gastos.toLocaleString(undefined, {maximumFractionDigits: 0});
+
+            const resNetoEl = document.getElementById('res-neto');
+            resNetoEl.textContent = (resultado >= 0 ? '+' : '') + '$' + resultado.toLocaleString(undefined, {maximumFractionDigits: 0});
+            resNetoEl.className = 'value ' + (resultado >= 0 ? 'green' : 'red');
+            document.getElementById('res-neto-label').textContent = resultado >= 0 ? 'Superávit' : 'Déficit';
+
+            document.getElementById('res-margen').textContent = margen.toFixed(1) + '%';
+            document.getElementById('res-margen').className = 'value ' + (margen >= 0 ? 'green' : 'red');
+
+            // Resultado box
+            const resultadoBox = document.getElementById('resultado-box');
+            const resultadoTitulo = document.getElementById('resultado-titulo');
+            const resultadoValor = document.getElementById('resultado-valor');
+            const resultadoMensaje = document.getElementById('resultado-mensaje');
+
+            if (resultado >= 0) {
+                resultadoBox.className = 'highlight-box success';
+                resultadoTitulo.textContent = 'SUPERÁVIT OPERACIONAL';
+                resultadoValor.textContent = '+$' + resultado.toLocaleString(undefined, {maximumFractionDigits: 0});
+                resultadoMensaje.textContent = 'La operación es autosostenible con las proyecciones actuales';
+            } else {
+                resultadoBox.className = 'highlight-box';
+                resultadoTitulo.textContent = 'DÉFICIT OPERACIONAL';
+                resultadoValor.textContent = '-$' + Math.abs(resultado).toLocaleString(undefined, {maximumFractionDigits: 0});
+                resultadoMensaje.textContent = 'Se requiere aporte de capital adicional';
+            }
+
+            document.getElementById('burn-rate').textContent = '$' + burnRate.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('runway').textContent = runway.toFixed(1) + ' meses';
+            document.getElementById('clientes-breakeven').textContent = clientesBreakeven;
+
+            const totalClientes = servicios.reduce((sum, s) => sum + s.clientes, 0);
+            if (totalClientes >= clientesBreakeven) {
+                document.getElementById('mes-breakeven').textContent = 'Logrado';
+                document.getElementById('mes-breakeven').className = 'value green';
+            } else {
+                document.getElementById('mes-breakeven').textContent = 'Pendiente';
+                document.getElementById('mes-breakeven').className = 'value yellow';
+            }
+
+            recalcularEscenarios();
+            actualizarGraficosPresupuesto();
+        }
+
+        // ==================== ESCENARIOS ====================
+        function recalcularEscenarios() {
+            const ingresos = calcularTotalIngresos();
+            const gastos = calcularTotalGastos();
+            const resultado = ingresos - gastos;
+            const valoracion = parseFloat(document.getElementById('valoracion-premoney').value) || 500000;
+
+            // Déficit
+            const deficitEl = document.getElementById('esc-deficit');
+            if (resultado >= 0) {
+                deficitEl.textContent = '+$' + resultado.toLocaleString(undefined, {maximumFractionDigits: 0});
+                deficitEl.className = 'value green';
+                document.getElementById('esc-deficit-label').textContent = 'Superávit';
+            } else {
+                deficitEl.textContent = '-$' + Math.abs(resultado).toLocaleString(undefined, {maximumFractionDigits: 0});
+                deficitEl.className = 'value red';
+                document.getElementById('esc-deficit-label').textContent = 'Déficit';
+            }
+
+            // Capital requerido considerando capital actual
+            const capitalReq = resultado < 0 ? Math.max(0, Math.abs(resultado) - capitalActual) : 0;
+            document.getElementById('esc-capital-req').textContent = '$' + capitalReq.toLocaleString(undefined, {maximumFractionDigits: 0});
+
+            // Escenarios de sensibilidad
+            const escenarios = [
+                { nombre: 'Pesimista', porcentaje: 50, color: 'var(--highlight)' },
+                { nombre: 'Conservador', porcentaje: 75, color: 'var(--warning)' },
+                { nombre: 'Base', porcentaje: 100, color: 'var(--success)' },
+                { nombre: 'Optimista', porcentaje: 125, color: 'var(--sell)' }
+            ];
+
+            let escenariosHTML = '';
+            let tablaDilucionHTML = '';
+            let datosGrafico = { labels: [], fundadores: [], pineda: [], inversores: [] };
+
+            escenarios.forEach(esc => {
+                const ingEsc = ingresos * (esc.porcentaje / 100);
+                const deficitEsc = ingEsc - gastos;
+                const capitalReqEsc = deficitEsc < 0 ? Math.max(0, Math.abs(deficitEsc)) : 0;
+                const equityCeder = capitalReqEsc > 0 ? (capitalReqEsc / (valoracion + capitalReqEsc)) * 100 : 0;
+                const fundadoresPost = (90 - equityCeder * 0.9).toFixed(1);
+                const pinedaPost = (10 - equityCeder * 0.1).toFixed(1);
+
+                escenariosHTML += `
+                    <div class="service-row" style="border-left-color: ${esc.color};">
+                        <div class="service-header">
+                            <h4 style="color: ${esc.color};">${esc.nombre.toUpperCase()} - ${esc.porcentaje}% de metas</h4>
+                            <span class="badge" style="background: ${esc.color}20; color: ${esc.color};">
+                                ${deficitEsc >= 0 ? 'Superávit' : 'Déficit'}
+                            </span>
+                        </div>
+                        <div class="grid" style="margin-top: 10px;">
+                            <div><strong>Ingresos:</strong> $${ingEsc.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                            <div><strong>Resultado:</strong> <span style="color: ${deficitEsc >= 0 ? 'var(--success)' : 'var(--highlight)'};">${deficitEsc >= 0 ? '+' : ''}$${deficitEsc.toLocaleString(undefined, {maximumFractionDigits: 0})}</span></div>
+                            <div><strong>Capital Req:</strong> $${capitalReqEsc.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                            <div><strong>Dilución:</strong> ${equityCeder.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                `;
+
+                tablaDilucionHTML += `
+                    <tr ${esc.porcentaje === 100 ? 'style="background: rgba(0,217,165,0.1);"' : ''}>
+                        <td>${esc.nombre}</td>
+                        <td>${esc.porcentaje}%</td>
+                        <td>$${ingEsc.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                        <td style="color: ${deficitEsc >= 0 ? 'var(--success)' : 'var(--highlight)'};">${deficitEsc >= 0 ? '+' : ''}$${deficitEsc.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                        <td>$${capitalReqEsc.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                        <td>${equityCeder.toFixed(1)}%</td>
+                        <td>${fundadoresPost}%</td>
+                        <td>${pinedaPost}%</td>
+                    </tr>
+                `;
+
+                datosGrafico.labels.push(esc.nombre);
+                datosGrafico.fundadores.push(parseFloat(fundadoresPost));
+                datosGrafico.pineda.push(parseFloat(pinedaPost));
+                datosGrafico.inversores.push(parseFloat(equityCeder.toFixed(1)));
+            });
+
+            document.getElementById('escenarios-container').innerHTML = escenariosHTML;
+            document.getElementById('tabla-dilucion-body').innerHTML = tablaDilucionHTML;
+
+            actualizarGraficoDilucion(datosGrafico);
+            actualizarGraficoBreakeven();
+        }
+
+        // ==================== GRÁFICOS ====================
+        let chartIngresos, chartTipoIngreso, chartPresIngresos, chartFlujoMensual, chartDilucion, chartBreakeven, chartVesting, chartJurisdiccion;
+
+        function actualizarGraficos() {
+            const colores = {
+                launch: '#6c5ce7',
+                sell: '#00cec9',
+                optimize: '#fdcb6e',
+                custom: '#ffc107'
+            };
+
+            // Gráfico de ingresos por servicio
+            const ctxIngresos = document.getElementById('chartIngresos').getContext('2d');
+            if (chartIngresos) chartIngresos.destroy();
+            chartIngresos = new Chart(ctxIngresos, {
+                type: 'doughnut',
+                data: {
+                    labels: servicios.map(s => s.nombre),
+                    datasets: [{
+                        data: servicios.map(s => calcularIngresoCliente(s) * s.clientes),
+                        backgroundColor: servicios.map(s => colores[s.tipo] || colores.custom),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#eaeaea' } } }
+                }
+            });
+
+            // Gráfico tipo de ingreso
+            let totalSetups = 0, totalSuscripciones = 0, totalFees = 0;
+            servicios.forEach(s => {
+                totalSetups += s.setup * s.clientes;
+                totalSuscripciones += s.mensual * 12 * s.clientes;
+                totalFees += (s.feePauta / 100) * s.pautaMensual * 12 * s.clientes;
+            });
+
+            const ctxTipo = document.getElementById('chartTipoIngreso').getContext('2d');
+            if (chartTipoIngreso) chartTipoIngreso.destroy();
+            chartTipoIngreso = new Chart(ctxTipo, {
+                type: 'bar',
+                data: {
+                    labels: ['Setups (One-time)', 'Suscripciones (Recurrente)', 'Fee Pauta'],
+                    datasets: [{
+                        label: 'USD',
+                        data: [totalSetups, totalSuscripciones, totalFees],
+                        backgroundColor: ['#e94560', '#00d9a5', '#ffc107']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { ticks: { color: '#a0a0a0', callback: v => '$' + (v/1000) + 'k' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function actualizarGraficosPresupuesto() {
+            // Composición de ingresos
+            let totalSetups = 0, totalSuscripciones = 0, totalFees = 0;
+            servicios.forEach(s => {
+                totalSetups += s.setup * s.clientes;
+                totalSuscripciones += s.mensual * 12 * s.clientes;
+                totalFees += (s.feePauta / 100) * s.pautaMensual * 12 * s.clientes;
+            });
+
+            const ctxPresIng = document.getElementById('chartPresIngresos').getContext('2d');
+            if (chartPresIngresos) chartPresIngresos.destroy();
+            chartPresIngresos = new Chart(ctxPresIng, {
+                type: 'pie',
+                data: {
+                    labels: ['Setups', 'Suscripciones', 'Fee Pauta'],
+                    datasets: [{
+                        data: [totalSetups, totalSuscripciones, totalFees],
+                        backgroundColor: ['#e94560', '#00d9a5', '#ffc107'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#eaeaea' } } }
+                }
+            });
+
+            // Flujo mensual
+            const ingresosMensual = calcularTotalIngresos() / 12;
+            const gastosMensual = calcularTotalGastos() / 12;
+            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+            const ctxFlujo = document.getElementById('chartFlujoMensual').getContext('2d');
+            if (chartFlujoMensual) chartFlujoMensual.destroy();
+            chartFlujoMensual = new Chart(ctxFlujo, {
+                type: 'line',
+                data: {
+                    labels: meses,
+                    datasets: [
+                        {
+                            label: 'Ingresos',
+                            data: meses.map(() => ingresosMensual),
+                            borderColor: '#00d9a5',
+                            backgroundColor: 'rgba(0,217,165,0.1)',
+                            fill: true
+                        },
+                        {
+                            label: 'Gastos',
+                            data: meses.map(() => gastosMensual),
+                            borderColor: '#e94560',
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { ticks: { color: '#a0a0a0', callback: v => '$' + (v/1000) + 'k' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { color: '#eaeaea' } } }
+                }
+            });
+        }
+
+        function actualizarGraficoDilucion(datos) {
+            const ctx = document.getElementById('chartDilucion').getContext('2d');
+            if (chartDilucion) chartDilucion.destroy();
+            chartDilucion = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: datos.labels,
+                    datasets: [
+                        { label: 'Fundadores', data: datos.fundadores, backgroundColor: '#0f3460' },
+                        { label: 'JP Pineda', data: datos.pineda, backgroundColor: '#00d9a5' },
+                        { label: 'Nuevos Inversores', data: datos.inversores, backgroundColor: '#e94560' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { stacked: true, ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        y: { stacked: true, max: 100, ticks: { color: '#a0a0a0', callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { color: '#eaeaea' } } }
+                }
+            });
+        }
+
+        function actualizarGraficoBreakeven() {
+            const arpc = servicios.reduce((sum, s) => sum + s.clientes, 0) > 0
+                ? calcularTotalIngresos() / servicios.reduce((sum, s) => sum + s.clientes, 0)
+                : 2771;
+            const gastos = calcularTotalGastos();
+            const clientesBreakeven = Math.ceil(gastos / arpc);
+
+            const puntos = [0, 20, 40, 60, 80, 100, 120, 140];
+            const ingresos = puntos.map(c => c * arpc);
+
+            const ctx = document.getElementById('chartBreakeven').getContext('2d');
+            if (chartBreakeven) chartBreakeven.destroy();
+            chartBreakeven = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: puntos,
+                    datasets: [
+                        {
+                            label: 'Ingresos',
+                            data: ingresos,
+                            borderColor: '#00d9a5',
+                            backgroundColor: 'rgba(0,217,165,0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'Gastos',
+                            data: puntos.map(() => gastos),
+                            borderColor: '#e94560',
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { ticks: { color: '#a0a0a0', callback: v => '$' + (v/1000) + 'k' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.1)' }, title: { display: true, text: '# Clientes', color: '#a0a0a0' } }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { color: '#eaeaea' } } }
+                }
+            });
+        }
+
+        // Gráfico de vesting
+        function initChartVesting() {
+            const ctx = document.getElementById('chartVesting').getContext('2d');
+            chartVesting = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene 2026', 'Ene 2027', 'Ene 2028'],
+                    datasets: [{
+                        label: '% Compañía',
+                        data: [3.33, 6.67, 10],
+                        borderColor: '#00d9a5',
+                        backgroundColor: 'rgba(0,217,165,0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { max: 12, ticks: { color: '#a0a0a0', callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Gráfico jurisdicción
+        function initChartJurisdiccion() {
+            const ctx = document.getElementById('chartJurisdiccion').getContext('2d');
+            chartJurisdiccion = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Colombia', 'Panamá', 'USA'],
+                    datasets: [{
+                        data: [6893.12, 37467.19, 8972],
+                        backgroundColor: ['#00d9a5', '#ffc107', '#e94560'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#eaeaea' } } }
+                }
+            });
+        }
+
+        // ==================== INICIALIZACIÓN ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            renderServicios();
+            renderGastos();
+            initChartJurisdiccion();
+            initChartVesting();
+            recalcularTodo();
+        });
+    </script>
+</body>
+</html>
