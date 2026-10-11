@@ -1,137 +1,114 @@
 # CLAUDE.md - Reglas del Proyecto RADIKAL TECH CLUB
 
 ## Descripcion del Proyecto
-Radikal Tech Club es una plataforma "One-Stop Shop" de IA para comercializacion y mercadeo dirigida a MiPyMEs (Micro, Pequenas y Medianas Empresas) en Latinoamerica, especificamente Colombia, Mexico, Chile, Costa Rica y Panama.
+Radikal es una plataforma de marketing con inteligencia artificial: cinco agentes (Ankor, Sira, Nexo, Kronos, Indexa) que investigan la marca y su competencia, generan imagenes, videos y textos, y los publican en redes sociales. Mercado hispanohablante en Latinoamerica y Estados Unidos. Sitio: https://www.radikaltech.ai
+
+Hasta 2025 el proyecto exploro otros modelos (precios del agro, comercializacion de productos, venta en Estados Unidos con Shopify e IA). La plataforma actual funciona desde mayo de 2026.
+
+## Contexto completo (leer siempre)
+El detalle del proyecto esta en un archivo local que no va a Git:
+
+@CONTEXTO_RADIKAL.md
+
+Ahi estan: producto y sitio, historia de los pivotes, personas, estructura societaria, ronda de inversion, cifras actuales e historicas, inconsistencias detectadas, entregables y pendientes. Si ese archivo no carga, leerlo a mano antes de trabajar.
+
+## El repositorio es PUBLICO
+- **GitHub:** https://github.com/Fsardi19/radikal-tech-club (visibilidad publica)
+- Este archivo y la carpeta `.claude/` estan versionados. **No escribir aqui ni en `.claude/` cifras, terminos de la ronda, participaciones, nombres de inversionistas ni nada confidencial.** Eso va en `CONTEXTO_RADIKAL.md`.
+- No ejecutar `git add .` sin revisar antes `git status`.
+- No hacer commit ni push sin que el usuario lo pida.
 
 ## Estructura del Proyecto
 ```
 RADIKAL TECH CLUB/
-├── .claude/                    # Documentacion de sesiones Claude
-│   ├── SESSION_LOG.md          # Historial detallado de sesiones
-│   ├── PROGRESO.md             # Estado actual del proyecto
+├── CLAUDE.md                   # Este archivo (publico)
+├── CONTEXTO_RADIKAL.md         # Contexto completo (LOCAL, no en Git)
+├── .claude/                    # Documentacion de sesiones (publico)
+│   ├── SESSION_LOG.md          # Historial de sesiones
+│   ├── PROGRESO.md             # Estado actual
 │   ├── PROMPT_APERTURA.md      # Prompt para iniciar sesion
 │   └── RESUMEN_PROXIMA_SESION.md
-├── .streamlit/                 # Configuracion Streamlit
-│   └── config.toml             # Tema oscuro personalizado
-├── DOCS/                       # Documentos de referencia (NO en Git)
-│   ├── ANALISIS/               # Analisis de mercado, investigacion
-│   └── ESTRATEGIA/             # Planes estrategicos
-├── FINANCIERO/                 # Documentos financieros
-│   ├── DASHBOARD_RADIKAL_2026.html  # Dashboard HTML (en Git)
-│   ├── Inversion Radikal.xlsx       # Datos inversion (local)
-│   ├── Presupuesto Radikal 2026.xlsx # Presupuesto (local)
-│   └── CONVERTIBLE PROMISSORY NOTE.docx
-├── LEGAL/                      # Contratos legales (NO en Git)
-│   ├── CONTRATO_VESTING_JUAN_PABLO_PINEDA.html (Panama Law)
-│   └── VESTING_AGREEMENT_JUAN_PABLO_PINEDA_NY_LAW.html (NY Law)
-├── streamlit_app.py            # App principal Streamlit
-├── requirements.txt            # Dependencias Python
-├── README.md                   # Documentacion publica
-├── CLAUDE.md                   # Este archivo
+├── RONDA/                      # Entregables de la ronda y la asamblea (LOCAL)
+│   └── LINEA_DE_TIEMPO_PIVOTES_RADIKAL.html
+├── DOCS/                       # Documentos de referencia (LOCAL)
+│   ├── ANALISIS/               # Mercado, investigacion, recomendaciones vs Sintra
+│   └── ESTRATEGIA/             # Plan estrategico v4 (nov 2025)
+├── FINANCIERO/                 # Dashboard HTML (en Git); xlsx y docx (LOCAL)
+├── LEGAL/                      # Contratos de vesting (LOCAL)
+├── streamlit_app.py            # Dashboard Streamlit (modelo financiero anterior)
+├── Recomendaciones_Optimizacion_RADIKAL_TECH_AI.html
+├── requirements.txt
+├── README.md
 └── .gitignore
 ```
 
-## Repositorio y Deploy
-- **GitHub:** https://github.com/Fsardi19/radikal-tech-club
-- **Streamlit Cloud:** https://radikal-tech-club.streamlit.app (pendiente deploy)
+Carpetas hermanas en `../`:
+- `RADIKAL ORIGINAL/` - estrategia de negocio y de marca de 2024 (etapa anterior).
+- `PIANO PIANO/` - proyecto aparte del aceite de oliva, una de las marcas de prueba.
 
 ## Reglas y Preferencias
 
 ### Formato de Entregables
 - **PREFERIR HTML** sobre Markdown para visualizaciones y reportes
 - Usar Chart.js (HTML) o Plotly (Streamlit) para graficos interactivos
-- Dashboard con tabs/secciones navegables
 - Colores del proyecto: #1a1a2e (primary), #e94560 (highlight), #00d9a5 (success)
+- El sitio web usa otros colores (morado oscuro y rosado). Preguntar cual usar si el entregable es de cara a clientes.
+- Entregables para la asamblea o inversionistas: guardarlos en `RONDA/`
 
 ### Idioma
 - Documentacion en **ESPANOL**
 - Variables y codigo en ingles
 
-### Datos Financieros Criticos
-```
-TRM (COP/USD): 3,650
-Inversion Total: $113,935.27 USD
-├── Pre-JP Pineda: $60,602.97
-└── Desde JP Pineda: $53,332.31
+### Cifras
+- Las cifras del modelo de enero de 2026 (Launch / Sell / Optimize, breakeven de 102 clientes) ya no aplican.
+- Las cifras actuales vienen de una conversacion y no estan validadas. **Confirmar con el usuario antes de ponerlas en un entregable.**
+- Separar siempre datos "Antes de JP" y "Desde JP".
+- Vesting de JP Pineda: **3 anos, no 4**.
 
-Gastos Admin Anuales: $281,719 USD
-Gasto Mensual (Burn Rate): $23,477 USD
-Breakeven: 102 clientes
-```
+## Para Leer al Inicio de Sesion
+1. Este archivo y `CONTEXTO_RADIKAL.md`
+2. `.claude/RESUMEN_PROXIMA_SESION.md`
+3. `.claude/PROGRESO.md`
 
-### Equity JP Pineda
-```
-Participacion: 10% (111 de 1,111 acciones)
-Vesting: 3 ANOS (NO 4), 33% anual
-├── Enero 2026: 3.33%
-├── Enero 2027: 6.67%
-└── Enero 2028: 10.0%
-
-Condiciones:
-- Sin pago por acciones
-- Compromiso de capitalizacion pro-rata segun % vested
-```
-
-### Modelo de Servicios (precios USD)
-| Servicio | Setup | Mensual | Fee Pauta |
-|----------|-------|---------|-----------|
-| Launch | $800 | $75 | - |
-| Sell | $1,500 | $150 | 15% |
-| Optimize | $600 | $200 | - |
-
-## Archivos Importantes
-
-### Para Leer al Inicio de Sesion
-1. `.claude/RESUMEN_PROXIMA_SESION.md` - Quick reference
-2. `.claude/PROGRESO.md` - Estado actual y pendientes
-3. Este archivo (`CLAUDE.md`) - Reglas del proyecto
-
-### Documentos de Referencia (carpeta DOCS/)
-- `ANALISIS/Analisis de Mercado de Servicios AI.pdf` - Estudio de mercado
-- `ESTRATEGIA/Plan_Estrategico_Radikal_One_Stop_Shop_v4.docx` - Plan completo
-
-### Entregables Principales
-- `FINANCIERO/DASHBOARD_RADIKAL_2026.html` - Dashboard HTML interactivo
-- `streamlit_app.py` - Dashboard Streamlit (deploy en cloud)
-- `LEGAL/CONTRATO_VESTING_*.html` - Contratos de vesting (Panama y NY Law)
+## Al Cerrar la Sesion
+1. Actualizar `CONTEXTO_RADIKAL.md` con todo lo nuevo (incluido lo confidencial)
+2. Actualizar `.claude/SESSION_LOG.md`, `PROGRESO.md` y `RESUMEN_PROXIMA_SESION.md` sin datos confidenciales
+3. Actualizar la memoria de Claude si cambio algo duradero
 
 ## Cosas a Recordar
 
 ### Hacer
-- Usar extraccion XML para leer archivos .docx/.xlsx
-- Separar datos "Antes de JP" vs "Desde JP"
+- Usar `~/.claude/xlsx-venv/bin/python` para leer .docx y .xlsx
+- Indicar de donde sale cada cifra (sitio, reunion o archivo)
 - Validar numeros con el usuario
 - Crear visuales HTML o Streamlit interactivos
-- Mantener Git actualizado con cambios relevantes
 
 ### Evitar
 - Asumir vesting de 4 anos (son 3)
 - Mezclar periodos de inversion
 - Crear archivos Markdown cuando se pide HTML
-- Usar precios irreales para MiPyMEs
-- Subir archivos sensibles (.xlsx, .docx, LEGAL/) a Git
+- Usar las cifras del modelo anterior como si fueran vigentes
+- Subir a Git archivos sensibles (.xlsx, .docx, LEGAL/, RONDA/, CONTEXTO_RADIKAL.md)
 
 ## Comandos Utiles
 
 ```bash
-# Abrir dashboard HTML
+# Abrir la linea de tiempo de la ronda
+open "RONDA/LINEA_DE_TIEMPO_PIVOTES_RADIKAL.html"
+
+# Abrir dashboard HTML (modelo anterior)
 open "FINANCIERO/DASHBOARD_RADIKAL_2026.html"
 
 # Ejecutar Streamlit local
 streamlit run streamlit_app.py
 
-# Git - actualizar repo
-git add . && git commit -m "mensaje" && git push
-
-# Extraer texto de Word
-unzip -p "archivo.docx" word/document.xml | sed 's/<[^>]*>//g'
+# Git - revisar antes de subir (repo publico)
+git status
 ```
 
 ## Contacto y Contexto
 - **Organizacion:** El Green Hub / RADIKAL
-- **CEO:** Juan Pablo Pineda (10% equity)
-- **Equipo:** Alejandro Rua, Oscar Perez, David Duarte
-- **Mercado objetivo:** ~8 millones de MiPyMEs en LATAM
+- **Personas y roles:** ver `CONTEXTO_RADIKAL.md`
 
 ---
-**Ultima actualizacion:** 27 Enero 2026
+**Ultima actualizacion:** 7 Octubre 2026

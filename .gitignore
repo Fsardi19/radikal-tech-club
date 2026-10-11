@@ -34,6 +34,8 @@ Thumbs.db
 
 # Sensitive/Large files (keep local, don't push)
 DOCS/
+RONDA/
+CONTEXTO_RADIKAL.md
 FINANCIERO/*.xlsx
 FINANCIERO/*.docx
 LEGAL/
